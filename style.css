@@ -1,0 +1,198 @@
+:root {
+  --primary: #008080;
+  --font-size: 15px;
+}
+
+body {
+  padding: 10px;
+  background-color: #f8f9fa;
+  font-size: var(--font-size);
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.app-title {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #333333 !important;
+}
+
+/* 탭 메뉴 스타일 */
+.nav-tabs {
+  display: flex;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.nav-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #6c757d;
+  border-bottom: 3px solid transparent;
+}
+
+.nav-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* 상태 뱃지 스타일 */
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.badge-danger {
+  background-color: #e63946; /* 폐기 (빨간색) */
+}
+
+.badge-warning { 
+  background-color: #f4a261; /* 유통기한 임박 (주황색) */
+  color: #ffffff !important; 
+}
+
+.badge-success {
+  background-color: #2a9d8f; /* OK (초록색) */
+}
+
+.badge-secondary {
+  background-color: #6c757d; /* 기타 */
+}
+
+/* 카드 UI 스타일 */
+.card {
+  background: #fdfdfd;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.card-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin: 0;
+  color: #333333
+}
+
+.card-info {
+  font-size: 13px;
+  color: #4a5568;
+  margin: 2px 0;
+}
+
+/* 필터 버튼 그룹 */
+.filter-group {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+}
+
+.filter-btn {
+  padding: 5px 10px;
+  font-size: 12px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.loading-spinner {
+  text-align: center;
+  display: none;
+  padding: 15px 0;
+  color: #6c757d;
+}
+
+/* 비밀번호 모달 크기 제한 */
+dialog article {
+  max-width: 400px;
+}
+
+/* 압축된 장바구니 리스트 아이템 UI */
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  background-color: #f8f9fa;
+  font-size: 13px;
+}
+.cart-item-info {
+  flex: 1;
+}
+.cart-item-info strong {
+  color: #2c3e50;
+  display: block;
+}
+.remove-btn {
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  margin-left: 10px;
+  margin-bottom: 0 !important;
+  cursor: pointer;
+  font-size: 12px;
+  width: auto;
+}
+
+/* 하단 플로팅 일괄 전송 버튼 UI */
+.floating-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  background-color: var(--primary);
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 15px;
+  border-radius: 30px;
+  box-shadow: 0 4px 12px rgba(0, 128, 128, 0.4);
+  z-index: 1000;
+  border: none;
+  cursor: pointer;
+}
+.floating-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+#entryForm label {
+  color: #333333 !important; /* 이 부분의 색상 코드를 원하는 색으로 변경하세요 */
+}
