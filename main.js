@@ -5,7 +5,7 @@ const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwD8AR3Csj153b_
 
 let storedPin = "";
 let allProducts = [];
-let stagedItems = []; // 장바구니(대기열) 배열 추가
+let stagedItems = []; // 장바구니(대기열) 배열 추가 
 let currentFilter = "폐기";
 
 window.onload = function() {
