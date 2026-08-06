@@ -18,10 +18,11 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
-.app-title {
+/* Phase 4-1: !important 제거 — 선택자 구체화로 Pico CSS 오버라이드 */
+body .container .app-title {
   text-align: center;
   margin-bottom: 15px;
-  color: #333333 !important;
+  color: #333333;
 }
 
 /* 탭 메뉴 스타일 */
@@ -68,9 +69,10 @@ body {
   background-color: #e63946; /* 폐기 (빨간색) */
 }
 
-.badge-warning { 
+/* Phase 4-1: !important 제거 — .badge 체이닝으로 우선순위 확보 */
+.badge.badge-warning {
   background-color: #f4a261; /* 유통기한 임박 (주황색) */
-  color: #ffffff !important; 
+  color: #ffffff;
 }
 
 .badge-success {
@@ -101,7 +103,7 @@ body {
   font-weight: bold;
   font-size: 16px;
   margin: 0;
-  color: #333333
+  color: #333333; /* Phase 4-2: 세미콜론 누락 수정 */
 }
 
 .card-info {
@@ -137,7 +139,21 @@ dialog article {
   max-width: 400px;
 }
 
-/* 압축된 장바구니 리스트 아이템 UI */
+/* Phase 4-3: 인라인 스타일 → 클래스 분리 */
+.cart-section {
+  display: none;
+  margin-top: 20px;
+  padding-bottom: 80px;
+}
+
+.cart-section-title {
+  font-size: 15px;
+  color: var(--primary);
+  border-bottom: 2px solid #eee;
+  padding-bottom: 5px;
+}
+
+/* 장바구니 리스트 아이템 UI */
 .cart-item {
   display: flex;
   justify-content: space-between;
@@ -149,21 +165,25 @@ dialog article {
   background-color: #f8f9fa;
   font-size: 13px;
 }
+
 .cart-item-info {
   flex: 1;
 }
+
 .cart-item-info strong {
   color: #2c3e50;
   display: block;
 }
-.remove-btn {
+
+/* Phase 4-1: !important 제거 — 선택자 구체화 */
+.cart-item .remove-btn {
   background-color: transparent;
   color: white;
   border: none;
   border-radius: 4px;
   padding: 4px 10px;
   margin-left: 10px;
-  margin-bottom: 0 !important;
+  margin-bottom: 0;
   cursor: pointer;
   font-size: 12px;
   width: auto;
@@ -171,6 +191,7 @@ dialog article {
 
 /* 하단 플로팅 일괄 전송 버튼 UI */
 .floating-btn {
+  display: none; /* 초기 숨김 (JS에서 display 제어) */
   position: fixed;
   bottom: 20px;
   left: 50%;
@@ -188,11 +209,39 @@ dialog article {
   border: none;
   cursor: pointer;
 }
+
 .floating-btn:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
 }
 
-#entryForm label {
-  color: #333333 !important; /* 이 부분의 색상 코드를 원하는 색으로 변경하세요 */
+/* Phase 4-1: !important 제거 — body 선택자 추가로 우선순위 확보 */
+body #entryForm label {
+  color: #333333;
+}
+
+/* Phase 5: "더 보기" 페이지네이션 버튼 */
+.load-more-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  color: #555;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.load-more-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* 빈 결과 메시지 */
+.empty-message {
+  text-align: center;
+  color: #888;
+  padding: 20px 0;
 }
