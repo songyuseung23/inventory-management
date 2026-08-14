@@ -367,12 +367,15 @@ document.addEventListener('DOMContentLoaded', function () {
   function showDeleteModal(btn) {
     if (isDeleting) return; // 삭제 진행 중에는 새 삭제 요청 차단
 
-    var rowId = btn.dataset.rowId;
-    var name = btn.dataset.name;
+    pendingDeleteItem = {
+      productCode:  btn.dataset.code,
+      expiryDate:   btn.dataset.expiry,
+      receivedDate: btn.dataset.received,
+      productName:  btn.dataset.name,
+      btnElement:   btn
+    };
 
-    pendingDeleteItem = { rowId: parseInt(rowId, 10), btnElement: btn };
-
-    DOM.deleteModalMsg.textContent = '「' + name + '」 항목을 삭제하시겠습니까?';
+    DOM.deleteModalMsg.textContent = '「' + btn.dataset.name + '」 항목을 삭제하시겠습니까?';
     DOM.deleteModal.setAttribute('open', true);
   }
 
@@ -392,8 +395,8 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    var rowId = pendingDeleteItem.rowId;
-    var card = pendingDeleteItem.btnElement.closest('.card');
+    var item = pendingDeleteItem;
+    var card = item.btnElement.closest('.card');
 
     // 모달 닫기 + 카드에 로딩 오버레이 + 중복 삭제 방지
     DOM.deleteModal.removeAttribute('open');
@@ -403,7 +406,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var payload = {
       pin: storedPin,
       action: "delete",
-      rowId: rowId
+      productCode:  item.productCode,
+      expiryDate:   item.expiryDate,
+      receivedDate: item.receivedDate
     };
 
     fetch(GAS_WEB_APP_URL, {
@@ -415,16 +420,17 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(function (res) {
         if (res.result === "success") {
           alert("삭제되었습니다.");
-          // 로컬 데이터에서 해당 항목 제거
+          // 로컬 데이터에서 첫 번째 매칭 항목만 제거
+          var removed = false;
           allProducts = allProducts.filter(function (p) {
-            return p.rowId !== rowId;
-          });
-          // 삭제된 행보다 아래에 있던 항목들의 rowId를 1씩 감소
-          // (스프레드시트에서 행 삭제 시 아래 행이 위로 밀려오는 것을 반영)
-          allProducts.forEach(function (p) {
-            if (p.rowId > rowId) {
-              p.rowId = p.rowId - 1;
+            if (!removed &&
+                p.productCode === item.productCode &&
+                p.expiryDate === item.expiryDate &&
+                p.receivedDate === item.receivedDate) {
+              removed = true;
+              return false;
             }
+            return true;
           });
           lastFetchTime = 0; // 캐시 무효화
           renderList();
@@ -496,7 +502,10 @@ document.addEventListener('DOMContentLoaded', function () {
           '<span class="card-title">' + escapeHTML(item.productName) + '</span>' +
           '<div class="card-header-actions">' +
             '<span class="badge ' + badgeClass + '">' + escapeHTML(item.status || '기타') + '</span>' +
-            '<button type="button" class="card-delete-btn" data-row-id="' + item.rowId + '" ' +
+            '<button type="button" class="card-delete-btn" ' +
+              'data-code="' + escapeHTML(item.productCode) + '" ' +
+              'data-expiry="' + escapeHTML(item.expiryDate) + '" ' +
+              'data-received="' + escapeHTML(item.receivedDate) + '" ' +
               'data-name="' + escapeHTML(item.productName) + '">✕</button>' +
           '</div>' +
         '</div>' +
