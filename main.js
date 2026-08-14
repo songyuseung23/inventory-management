@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let searchTimer = null;
   let currentPage = 1;
   let pendingDeleteItem = null; // 삭제 대기 중인 물품 정보
+  let isDeleting = false; // 삭제 진행 중 중복 방지
 
   // ========================================
   // Phase 2-3: DOM 요소 캐싱
@@ -364,6 +365,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 삭제 확인 모달 표시
   function showDeleteModal(btn) {
+    if (isDeleting) return; // 삭제 진행 중에는 새 삭제 요청 차단
+
     var rowId = btn.dataset.rowId;
     var name = btn.dataset.name;
 
@@ -392,9 +395,10 @@ document.addEventListener('DOMContentLoaded', function () {
     var rowId = pendingDeleteItem.rowId;
     var card = pendingDeleteItem.btnElement.closest('.card');
 
-    // 모달 닫기 + 카드에 로딩 오버레이
+    // 모달 닫기 + 카드에 로딩 오버레이 + 중복 삭제 방지
     DOM.deleteModal.removeAttribute('open');
     card.classList.add('card-deleting');
+    isDeleting = true;
 
     var payload = {
       pin: storedPin,
@@ -411,9 +415,16 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(function (res) {
         if (res.result === "success") {
           alert("삭제되었습니다.");
-          // 로컬 데이터에서도 제거
+          // 로컬 데이터에서 해당 항목 제거
           allProducts = allProducts.filter(function (p) {
             return p.rowId !== rowId;
+          });
+          // 삭제된 행보다 아래에 있던 항목들의 rowId를 1씩 감소
+          // (스프레드시트에서 행 삭제 시 아래 행이 위로 밀려오는 것을 반영)
+          allProducts.forEach(function (p) {
+            if (p.rowId > rowId) {
+              p.rowId = p.rowId - 1;
+            }
           });
           lastFetchTime = 0; // 캐시 무효화
           renderList();
@@ -433,6 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .finally(function () {
         pendingDeleteItem = null;
+        isDeleting = false;
       });
   }
 
