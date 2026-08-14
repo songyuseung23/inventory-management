@@ -245,3 +245,69 @@ body #entryForm label {
   color: #888;
   padding: 20px 0;
 }
+
+/* ========================================
+   물품 삭제 기능
+   ======================================== */
+
+/* 카드 헤더 액션 영역 (뱃지 + 삭제 버튼) */
+.card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* 카드 삭제 버튼 */
+.card .card-delete-btn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  line-height: 1;
+  color: #999;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.card .card-delete-btn:hover {
+  color: #e63946;
+  border-color: #e63946;
+  background-color: #fef2f2;
+}
+
+/* 삭제 진행 중 카드 오버레이 */
+.card-deleting {
+  position: relative;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* 삭제 확인 모달 */
+#deleteModal article {
+  max-width: 360px;
+}
+
+#deleteModal footer {
+  display: flex;
+  gap: 8px;
+}
+
+#deleteModal footer button {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.delete-confirm-btn {
+  background-color: #e63946;
+  border-color: #e63946;
+  color: #fff;
+}

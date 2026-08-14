@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let lastFetchTime = 0;
   let searchTimer = null;
   let currentPage = 1;
+  let pendingDeleteItem = null; // 삭제 대기 중인 물품 정보
 
   // ========================================
   // Phase 2-3: DOM 요소 캐싱
@@ -50,6 +51,10 @@ document.addEventListener('DOMContentLoaded', function () {
     entryForm:    document.getElementById('entryForm'),
     tabBtnInput:  document.getElementById('tab-btn-input'),
     tabBtnList:   document.getElementById('tab-btn-list'),
+    deleteModal:      document.getElementById('deleteModal'),
+    deleteModalMsg:   document.getElementById('deleteModalMessage'),
+    deleteCancelBtn:  document.getElementById('deleteCancelBtn'),
+    deleteConfirmBtn: document.getElementById('deleteConfirmBtn'),
   };
 
   // ========================================
@@ -154,6 +159,20 @@ document.addEventListener('DOMContentLoaded', function () {
         removeFromCart(parseInt(btn.dataset.index, 10));
       }
     });
+
+    // 물품 카드 삭제 버튼 — 이벤트 위임
+    DOM.productList.addEventListener('click', function (e) {
+      var btn = e.target.closest('.card-delete-btn');
+      if (btn) {
+        showDeleteModal(btn);
+      }
+    });
+
+    // 삭제 모달: 취소 버튼
+    DOM.deleteCancelBtn.addEventListener('click', closeDeleteModal);
+
+    // 삭제 모달: 삭제 확인 버튼
+    DOM.deleteConfirmBtn.addEventListener('click', confirmDelete);
   }
 
   // ========================================
@@ -340,6 +359,84 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // ========================================
+  // 물품 삭제
+  // ========================================
+
+  // 삭제 확인 모달 표시
+  function showDeleteModal(btn) {
+    var rowId = btn.dataset.rowId;
+    var name = btn.dataset.name;
+
+    pendingDeleteItem = { rowId: parseInt(rowId, 10), btnElement: btn };
+
+    DOM.deleteModalMsg.textContent = '「' + name + '」 항목을 삭제하시겠습니까?';
+    DOM.deleteModal.setAttribute('open', true);
+  }
+
+  // 삭제 모달 닫기
+  function closeDeleteModal() {
+    DOM.deleteModal.removeAttribute('open');
+    pendingDeleteItem = null;
+  }
+
+  // 삭제 실행
+  function confirmDelete() {
+    if (!pendingDeleteItem) return;
+
+    if (!storedPin) {
+      closeDeleteModal();
+      DOM.pinModal.setAttribute('open', true);
+      return;
+    }
+
+    var rowId = pendingDeleteItem.rowId;
+    var card = pendingDeleteItem.btnElement.closest('.card');
+
+    // 모달 닫기 + 카드에 로딩 오버레이
+    DOM.deleteModal.removeAttribute('open');
+    card.classList.add('card-deleting');
+
+    var payload = {
+      pin: storedPin,
+      action: "delete",
+      rowId: rowId
+    };
+
+    fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        if (res.result === "success") {
+          alert("삭제되었습니다.");
+          // 로컬 데이터에서도 제거
+          allProducts = allProducts.filter(function (p) {
+            return p.rowId !== rowId;
+          });
+          lastFetchTime = 0; // 캐시 무효화
+          renderList();
+        } else {
+          alert("삭제 실패: " + res.message);
+          card.classList.remove('card-deleting');
+          if (res.message.includes("비밀번호")) {
+            sessionStorage.removeItem('userPin');
+            storedPin = "";
+            DOM.pinModal.setAttribute('open', true);
+          }
+        }
+      })
+      .catch(function (err) {
+        alert("통신 중 오류가 발생했습니다: " + err);
+        card.classList.remove('card-deleting');
+      })
+      .finally(function () {
+        pendingDeleteItem = null;
+      });
+  }
+
+  // ========================================
   // 목록 조회 · 필터링
   // ========================================
   function setFilter(status) {
@@ -385,7 +482,11 @@ document.addEventListener('DOMContentLoaded', function () {
       card.innerHTML =
         '<div class="card-header">' +
           '<span class="card-title">' + escapeHTML(item.productName) + '</span>' +
-          '<span class="badge ' + badgeClass + '">' + escapeHTML(item.status || '기타') + '</span>' +
+          '<div class="card-header-actions">' +
+            '<span class="badge ' + badgeClass + '">' + escapeHTML(item.status || '기타') + '</span>' +
+            '<button type="button" class="card-delete-btn" data-row-id="' + item.rowId + '" ' +
+              'data-name="' + escapeHTML(item.productName) + '">✕</button>' +
+          '</div>' +
         '</div>' +
         '<div class="card-info"><b>코드:</b> ' + escapeHTML(item.productCode) + '</div>' +
         '<div class="card-info"><b>유통기한:</b> ' + escapeHTML(item.expiryDate) + '</div>' +
