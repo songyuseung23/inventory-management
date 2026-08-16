@@ -376,6 +376,9 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     DOM.deleteModalMsg.textContent = '「' + btn.dataset.name + '」 항목을 삭제하시겠습니까?';
+    // 사유 라디오 초기화 (폐기 기본 선택)
+    var defaultRadio = document.querySelector('input[name="deleteReason"][value="폐기"]');
+    if (defaultRadio) defaultRadio.checked = true;
     DOM.deleteModal.setAttribute('open', true);
   }
 
@@ -403,12 +406,15 @@ document.addEventListener('DOMContentLoaded', function () {
     card.classList.add('card-deleting');
     isDeleting = true;
 
+    var deleteReason = document.querySelector('input[name="deleteReason"]:checked').value;
+
     var payload = {
       pin: storedPin,
       action: "delete",
       productCode:  item.productCode,
       expiryDate:   item.expiryDate,
-      receivedDate: item.receivedDate
+      receivedDate: item.receivedDate,
+      deleteReason: deleteReason
     };
 
     fetch(GAS_WEB_APP_URL, {
