@@ -100,10 +100,13 @@ body .container .app-title {
 }
 
 .card-title {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
   font-weight: bold;
   font-size: 16px;
   margin: 0;
-  color: #333333; /* Phase 4-2: 세미콜론 누락 수정 */
+  color: #333333;
 }
 
 .card-info {
