@@ -375,7 +375,9 @@ document.addEventListener('DOMContentLoaded', function () {
       btnElement:   btn
     };
 
-    DOM.deleteModalMsg.textContent = '「' + btn.dataset.name + '」 항목을 삭제하시겠습니까?';
+    DOM.deleteModalMsg.innerHTML =
+      '「' + escapeHTML(btn.dataset.name) + '」 항목을 삭제하시겠습니까?<br>' +
+      '<small style="color:#bbc6cd; font-size:1em">유통기한: ' + escapeHTML(btn.dataset.expiry) + '</small>';
     // 사유 라디오 초기화 (폐기 기본 선택)
     var defaultRadio = document.querySelector('input[name="deleteReason"][value="폐기"]');
     if (defaultRadio) defaultRadio.checked = true;

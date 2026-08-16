@@ -293,7 +293,16 @@ body #entryForm label {
 
 /* 삭제 확인 모달 */
 #deleteModal article {
-  max-width: 360px;
+  max-width: 460px;
+}
+
+#deleteModal h3 {
+  font-size: 20px;
+}
+
+#deleteModal p {
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 #deleteModal footer {
@@ -304,13 +313,16 @@ body #entryForm label {
 #deleteModal footer button {
   flex: 1;
   margin-bottom: 0;
+  font-size: 16px;
+  padding: 12px 16px;
 }
 
 /* 삭제 사유 라디오 그룹 */
 .delete-reason-group {
   display: flex;
+  justify-content: space-evenly;
   gap: 16px;
-  margin-bottom: 12px;
+  margin: 12px auto;
 }
 
 .delete-reason-group label {
@@ -318,8 +330,8 @@ body #entryForm label {
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  font-size: 14px;
-  color: #333;
+  font-size: 18px;
+  color: #d4bebe;
   margin-bottom: 0;
 }
 
