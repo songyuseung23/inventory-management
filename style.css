@@ -348,3 +348,15 @@ body #entryForm label {
   border-color: #e63946;
   color: #fff;
 }
+
+.deleter-label {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #333333;
+  text-align: left;
+}
+
+.deleter-label input {
+  margin-top: 5px;
+  margin-bottom: 12px;
+}

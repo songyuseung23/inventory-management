@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
     deleteModalMsg:   document.getElementById('deleteModalMessage'),
     deleteCancelBtn:  document.getElementById('deleteCancelBtn'),
     deleteConfirmBtn: document.getElementById('deleteConfirmBtn'),
+    deleterInput:     document.getElementById('deleterInput'),
   };
 
   // ========================================
@@ -381,7 +382,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // 사유 라디오 초기화 (폐기 기본 선택)
     var defaultRadio = document.querySelector('input[name="deleteReason"][value="폐기"]');
     if (defaultRadio) defaultRadio.checked = true;
+
+    // 삭제자 이름 복원 (최근 삭제자 -> 없으면 최근 조사자)
+    var savedDeleter = localStorage.getItem('lastDeleter') || localStorage.getItem('lastInspector') || '';
+    if (DOM.deleterInput) {
+      DOM.deleterInput.value = savedDeleter;
+    }
+
     DOM.deleteModal.setAttribute('open', true);
+    if (DOM.deleterInput && !savedDeleter) {
+      DOM.deleterInput.focus();
+    }
   }
 
   // 삭제 모달 닫기
@@ -394,11 +405,20 @@ document.addEventListener('DOMContentLoaded', function () {
   function confirmDelete() {
     if (!pendingDeleteItem) return;
 
+    var deleter = DOM.deleterInput ? DOM.deleterInput.value.trim() : '';
+    if (!deleter) {
+      alert("삭제자 이름을 입력해 주세요.");
+      if (DOM.deleterInput) DOM.deleterInput.focus();
+      return;
+    }
+
     if (!storedPin) {
       closeDeleteModal();
       DOM.pinModal.setAttribute('open', true);
       return;
     }
+
+    localStorage.setItem('lastDeleter', deleter);
 
     var item = pendingDeleteItem;
     var card = item.btnElement.closest('.card');
@@ -416,7 +436,8 @@ document.addEventListener('DOMContentLoaded', function () {
       productCode:  item.productCode,
       expiryDate:   item.expiryDate,
       receivedDate: item.receivedDate,
-      deleteReason: deleteReason
+      deleteReason: deleteReason,
+      deleter:      deleter
     };
 
     fetch(GAS_WEB_APP_URL, {
@@ -443,12 +464,18 @@ document.addEventListener('DOMContentLoaded', function () {
           lastFetchTime = 0; // 캐시 무효화
           renderList();
         } else {
-          alert("삭제 실패: " + res.message);
-          card.classList.remove('card-deleting');
-          if (res.message.includes("비밀번호")) {
-            sessionStorage.removeItem('userPin');
-            storedPin = "";
-            DOM.pinModal.setAttribute('open', true);
+          if (res.code === "ALREADY_DELETED" || (res.message && res.message.includes("이미 다른 사용자")) || (res.message && res.message.includes("찾을 수 없습니다"))) {
+            alert("이미 다른 사용자에 의해 처리된 물품입니다.\n최신 목록으로 자동 갱신합니다.");
+            lastFetchTime = 0; // 캐시 무효화
+            fetchProducts({ showUI: true });
+          } else {
+            alert("삭제 실패: " + res.message);
+            card.classList.remove('card-deleting');
+            if (res.message && res.message.includes("비밀번호")) {
+              sessionStorage.removeItem('userPin');
+              storedPin = "";
+              DOM.pinModal.setAttribute('open', true);
+            }
           }
         }
       })
